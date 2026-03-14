@@ -56,6 +56,28 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
   export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
 fi
 
+# ── Vi mode for line editing ──
+
+bindkey -v
+export KEYTIMEOUT=1
+
+# Cursor shape: beam for insert, block for normal
+function zle-keymap-select {
+  if [[ $KEYMAP == vicmd ]] || [[ $1 == 'block' ]]; then
+    echo -ne '\e[2 q'
+  else
+    echo -ne '\e[6 q'
+  fi
+}
+zle -N zle-keymap-select
+
+# Start with beam cursor (insert mode)
+function zle-line-init { echo -ne '\e[6 q' }
+zle -N zle-line-init
+
+# Keep Ctrl+R for reverse history search (vi mode disables it)
+bindkey '^R' history-incremental-search-backward
+
 # ── Aliases ──
 
 [ -f "$HOME/.aliases" ] && source "$HOME/.aliases"
