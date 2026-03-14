@@ -73,10 +73,10 @@ if [[ "$OS" == "Darwin" ]]; then
     SKIPPED+=("Mac App Store (mas not installed)")
   fi
 else
-  if command -v apt &>/dev/null; then
+  if command -v apt-get &>/dev/null; then
     echo "\n→ Updating system packages..."
-    if sudo apt update && sudo apt upgrade -y; then
-      sudo apt autoremove -y 2>/dev/null || true
+    if sudo apt-get update && sudo apt-get upgrade -y; then
+      sudo apt-get autoremove -y 2>/dev/null || true
       UPDATED+=("System packages (apt)")
       echo "  ✓ Done"
     else
