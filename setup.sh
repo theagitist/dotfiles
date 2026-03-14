@@ -112,6 +112,7 @@ install_package "bpytop" "bpytop" "bpytop"
 install_package "tldr" "tldr" "tldr"
 install_package "rg" "ripgrep" "ripgrep"
 install_package "jq" "jq" "jq"
+install_package "w3m" "w3m" "w3m"
 
 # fzf
 echo "\n── fzf ──"
