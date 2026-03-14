@@ -142,6 +142,24 @@ else
 fi
 
 install_package "vim" "vim" "vim-gtk3"
+
+# Vundle + vim plugins
+echo "\n── Vim ──"
+if [[ -d "$HOME/.vim/bundle/Vundle.vim" ]]; then
+  skip "vundle"
+else
+  info "Installing Vundle..."
+  git clone https://github.com/VundleVim/Vundle.vim.git "$HOME/.vim/bundle/Vundle.vim" && ok "vundle" || fail "vundle"
+fi
+if [[ -d "$HOME/.vim/bundle/Vundle.vim" ]]; then
+  info "Installing vim plugins..."
+  vim +PluginInstall +qall 2>/dev/null && ok "vim plugins" || fail "vim plugins"
+  # coc.nvim requires a build step
+  if [[ -d "$HOME/.vim/bundle/coc.nvim" && ! -f "$HOME/.vim/bundle/coc.nvim/build/index.js" ]]; then
+    info "Building coc.nvim..."
+    (cd "$HOME/.vim/bundle/coc.nvim" && npm ci 2>/dev/null) && ok "coc.nvim build" || fail "coc.nvim build"
+  fi
+fi
 install_package "curl" "curl" "curl"
 install_package "dig" "bind" "dnsutils"
 install_package "zip" "zip" "zip"
