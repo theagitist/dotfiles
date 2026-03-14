@@ -104,6 +104,36 @@ install_package "htop" "htop" "htop"
 install_package "bpytop" "bpytop" "bpytop"
 install_package "tldr" "tldr" "tldr"
 install_package "rg" "ripgrep" "ripgrep"
+install_package "jq" "jq" "jq"
+
+# fzf
+echo "\n── fzf ──"
+if command -v fzf &>/dev/null; then
+  skip "fzf"
+else
+  info "Installing fzf..."
+  if [[ "$OS" == "Darwin" ]]; then
+    brew install fzf && ok "fzf" || fail "fzf"
+  else
+    sudo apt-get install -y fzf && ok "fzf" || fail "fzf"
+  fi
+fi
+
+# delta (git pager)
+if command -v delta &>/dev/null; then
+  skip "delta"
+else
+  info "Installing delta..."
+  if [[ "$OS" == "Darwin" ]]; then
+    brew install git-delta && ok "delta" || fail "delta"
+  else
+    DELTA_VERSION=$(curl -s "https://api.github.com/repos/dandavison/delta/releases/latest" | grep -Po '"tag_name": "\K[^"]*')
+    curl -Lo /tmp/delta.deb "https://github.com/dandavison/delta/releases/latest/download/git-delta_${DELTA_VERSION}_amd64.deb" && \
+      sudo dpkg -i /tmp/delta.deb && \
+      rm -f /tmp/delta.deb && \
+      ok "delta" || fail "delta"
+  fi
+fi
 
 # fd: brew uses "fd", Ubuntu uses "fd-find" with binary "fdfind"
 if command -v fd &>/dev/null || command -v fdfind &>/dev/null; then
@@ -160,22 +190,19 @@ fi
 
 install_package "vim" "vim" "vim-gtk3"
 
-# Vundle + vim plugins
+# vim-plug + vim plugins
 echo "\n── Vim ──"
-if [[ -d "$HOME/.vim/bundle/Vundle.vim" ]]; then
-  skip "vundle"
+PLUG_FILE="$HOME/.vim/autoload/plug.vim"
+if [[ -f "$PLUG_FILE" ]]; then
+  skip "vim-plug"
 else
-  info "Installing Vundle..."
-  git clone https://github.com/VundleVim/Vundle.vim.git "$HOME/.vim/bundle/Vundle.vim" && ok "vundle" || fail "vundle"
+  info "Installing vim-plug..."
+  curl -fLo "$PLUG_FILE" --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim && ok "vim-plug" || fail "vim-plug"
 fi
-if [[ -d "$HOME/.vim/bundle/Vundle.vim" ]]; then
+if [[ -f "$PLUG_FILE" ]]; then
   info "Installing vim plugins..."
-  vim +PluginInstall +qall 2>/dev/null && ok "vim plugins" || fail "vim plugins"
-  # coc.nvim requires a build step
-  if [[ -d "$HOME/.vim/bundle/coc.nvim" && ! -f "$HOME/.vim/bundle/coc.nvim/build/index.js" ]]; then
-    info "Building coc.nvim..."
-    (cd "$HOME/.vim/bundle/coc.nvim" && npm ci 2>/dev/null) && ok "coc.nvim build" || fail "coc.nvim build"
-  fi
+  vim +PlugInstall +qall 2>/dev/null && ok "vim plugins" || fail "vim plugins"
 fi
 install_package "curl" "curl" "curl"
 install_package "dig" "bind" "dnsutils"

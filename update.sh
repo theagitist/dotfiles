@@ -86,9 +86,37 @@ else
   fi
 fi
 
-# ── Shared: Vim plugins (Vundle) ──
+# ── Shared: Vim plugins (vim-plug) ──
 
-run "Updating Vim plugins" vim +PluginUpdate +qall
+run "Updating Vim plugins" vim +PlugUpdate +qall
+
+# ── Shared: tmux plugins (TPM) ──
+
+if [[ -x "$HOME/.tmux/plugins/tpm/bin/update_plugins" ]]; then
+  run "Updating tmux plugins" "$HOME/.tmux/plugins/tpm/bin/update_plugins" all
+fi
+
+# ── Shared: bun ──
+
+if command -v bun &>/dev/null; then
+  run "Updating bun" bun upgrade
+fi
+
+# ── Shared: nvm + node ──
+
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+  source "$NVM_DIR/nvm.sh"
+  echo "\n→ Checking for Node.js updates..."
+  current=$(nvm current)
+  latest=$(nvm version-remote node 2>/dev/null)
+  if [[ "$current" != "$latest" && -n "$latest" ]]; then
+    run "Updating Node.js ($current → $latest)" nvm install node --reinstall-packages-from=current
+    nvm alias default node
+  else
+    echo "  ✓ Node.js $current is latest"
+    SKIPPED+=("Node.js (already up to date)")
+  fi
+fi
 
 # ── Shared: npm global packages ──
 

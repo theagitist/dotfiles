@@ -1,42 +1,38 @@
 " Set encoding first (some plugins check on init)
 set encoding=UTF-8
 
-" Set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-
 " Set leader key (default \)
 let mapleader = "\<Space>"
 
-call vundle#begin()
+call plug#begin('~/.vim/plugged')
 
-Plugin 'gmarik/Vundle.vim'
-Plugin 'ryanoasis/vim-devicons'
-Plugin 'frazrepo/vim-rainbow'
-Plugin 'vim-python/python-syntax'
-Plugin 'ap/vim-css-color'
-Plugin 'tpope/vim-surround'
-Plugin 'tpope/vim-fugitive'
-Plugin 'vim-airline/vim-airline'
-Plugin 'neoclide/coc.nvim', { 'branch': 'release' }
-Plugin 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plugin 'junegunn/fzf.vim'
-Plugin 'mbbill/undotree'
-Plugin 'dracula/vim'
-Plugin 'leafgarland/typescript-vim'
-Plugin 'vim-utils/vim-man'
-Plugin 'preservim/nerdtree'
-Plugin 'Xuyuanp/nerdtree-git-plugin'
-Plugin 'tiagofumo/vim-nerdtree-syntax-highlight'
-Plugin 'PhilRunninger/nerdtree-buffer-ops'
-Plugin 'PhilRunninger/nerdtree-visual-selection'
-Plugin 'goerz/jupytext.vim'
+Plug 'ryanoasis/vim-devicons'
+Plug 'frazrepo/vim-rainbow'
+Plug 'vim-python/python-syntax'
+Plug 'ap/vim-css-color'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-fugitive'
+Plug 'vim-airline/vim-airline'
+Plug 'neoclide/coc.nvim', { 'branch': 'release' }
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'mbbill/undotree'
+Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'leafgarland/typescript-vim'
+Plug 'vim-utils/vim-man'
+Plug 'preservim/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+Plug 'PhilRunninger/nerdtree-buffer-ops'
+Plug 'PhilRunninger/nerdtree-visual-selection'
+Plug 'goerz/jupytext.vim'
 
-call vundle#end()
+call plug#end()
 
 filetype plugin indent on
 
-"Remap ESC to ii
-:imap ii <Esc>
+"Remap ESC to jk
+:imap jk <Esc>
 
 " Git (vim-fugitive) key bindings
 nmap <leader>gs :G<CR>

@@ -4,6 +4,7 @@
 [core]
     editor = vim
     autocrlf = input
+    pager = delta
 
 [init]
     defaultBranch = main
@@ -17,8 +18,20 @@
 [fetch]
     prune = true
 
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true
+    side-by-side = true
+    syntax-theme = Dracula
+
+[column]
+    ui = auto
+
 [diff]
     colorMoved = zebra
+    algorithm = histogram
 
 [merge]
     conflictstyle = diff3

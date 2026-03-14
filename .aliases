@@ -17,6 +17,10 @@ fi
 # Navigation
 alias ..='cd ..'
 alias ...='cd ../..'
+mkcd() { mkdir -p "$1" && cd "$1" }
+
+# Grep
+alias grep='grep --color=auto'
 
 # Quick edit configs
 alias zshrc='$EDITOR ~/.zshrc'

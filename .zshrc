@@ -38,11 +38,20 @@ export LC_ALL=en_US.UTF-8
 export EDITOR=vim
 export SUDO_EDITOR="vim -u NONE"
 
-# ── nvm ──
+# ── nvm (lazy-loaded for faster shell startup) ──
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
+
+_nvm_lazy_load() {
+  unset -f nvm node npm npx
+  [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+  [ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
+}
+
+nvm()  { _nvm_lazy_load; nvm "$@" }
+node() { _nvm_lazy_load; node "$@" }
+npm()  { _nvm_lazy_load; npm "$@" }
+npx()  { _nvm_lazy_load; npx "$@" }
 
 # ── macOS-only ──
 
@@ -75,6 +84,10 @@ zle -N zle-line-init
 
 # Keep Ctrl+R for reverse history search (vi mode disables it)
 bindkey '^R' history-incremental-search-backward
+
+# ── fzf ──
+
+[ -f "$HOME/.fzf.zsh" ] && source "$HOME/.fzf.zsh" || eval "$(fzf --zsh 2>/dev/null)"
 
 # ── Aliases ──
 
