@@ -44,6 +44,30 @@ elif [[ -f "$HOME/.oh-my-zsh/tools/upgrade.sh" ]]; then
   run "Updating Oh My Zsh" "$HOME/.oh-my-zsh/tools/upgrade.sh"
 fi
 
+# ── Oh My Zsh custom plugins (git repos) ──
+
+ZSH_CUSTOM="${ZSH_CUSTOM:-${ZSH:-$HOME/.oh-my-zsh}/custom}"
+echo "\n→ Updating oh-my-zsh custom plugins..."
+omz_updated=0
+for plugin_dir in "$ZSH_CUSTOM"/plugins/*(N/); do
+  if [[ -d "$plugin_dir/.git" ]]; then
+    plugin_name="${plugin_dir:t}"
+    echo "  → $plugin_name"
+    if git -C "$plugin_dir" pull --rebase --quiet 2>/dev/null; then
+      omz_updated=$((omz_updated + 1))
+    else
+      ERRORS+=("omz plugin: $plugin_name")
+      echo "    ✗ Failed"
+    fi
+  fi
+done
+if (( omz_updated > 0 )); then
+  UPDATED+=("oh-my-zsh custom plugins ($omz_updated)")
+  echo "  ✓ Updated $omz_updated plugins"
+else
+  echo "  ✓ All plugins up to date"
+fi
+
 # ── OS-specific package managers ──
 
 if [[ "$OS" == "Darwin" ]]; then
@@ -196,6 +220,50 @@ if command -v composer &>/dev/null; then
   fi
 else
   SKIPPED+=("Composer (not installed)")
+fi
+
+# ── Linux-only: GitHub release binaries ──
+
+if [[ "$OS" != "Darwin" ]]; then
+  # lazygit
+  if command -v lazygit &>/dev/null; then
+    echo "\n→ Checking lazygit updates..."
+    current_lg=$(lazygit --version 2>/dev/null | grep -Po 'version=\K[^,]+' || echo "0")
+    latest_lg=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+    if [[ -n "$latest_lg" && "$current_lg" != "$latest_lg" ]]; then
+      run "Updating lazygit ($current_lg → $latest_lg)" bash -c "
+        curl -Lo /tmp/lazygit.tar.gz \"https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_\${1}_Linux_x86_64.tar.gz\" && \
+        tar xf /tmp/lazygit.tar.gz -C /tmp lazygit && \
+        sudo install /tmp/lazygit /usr/local/bin && \
+        rm -f /tmp/lazygit /tmp/lazygit.tar.gz
+      " -- "$latest_lg"
+    else
+      echo "  ✓ lazygit $current_lg is latest"
+      SKIPPED+=("lazygit (already up to date)")
+    fi
+  fi
+
+  # delta
+  if command -v delta &>/dev/null; then
+    echo "\n→ Checking delta updates..."
+    current_delta=$(delta --version 2>/dev/null | awk '{print $2}')
+    latest_delta=$(curl -s "https://api.github.com/repos/dandavison/delta/releases/latest" | grep -Po '"tag_name": "\K[^"]*')
+    if [[ -n "$latest_delta" && "$current_delta" != "$latest_delta" ]]; then
+      run "Updating delta ($current_delta → $latest_delta)" bash -c "
+        curl -Lo /tmp/delta.deb \"https://github.com/dandavison/delta/releases/latest/download/git-delta_\${1}_amd64.deb\" && \
+        sudo dpkg -i /tmp/delta.deb && \
+        rm -f /tmp/delta.deb
+      " -- "$latest_delta"
+    else
+      echo "  ✓ delta $current_delta is latest"
+      SKIPPED+=("delta (already up to date)")
+    fi
+  fi
+
+  # fzf (if installed from GitHub, not apt)
+  if command -v fzf &>/dev/null && [[ -d "$HOME/.fzf" ]]; then
+    run "Updating fzf" bash -c "cd $HOME/.fzf && git pull && ./install --key-bindings --completion --no-update-rc"
+  fi
 fi
 
 # ── macOS-only: software updates ──
