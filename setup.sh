@@ -99,6 +99,23 @@ echo "\n── CLI Tools ──"
 install_package "eza" "eza" "eza"
 install_package "zoxide" "zoxide" "zoxide"
 install_package "gh" "gh" "gh"
+install_package "ncdu" "ncdu" "ncdu"
+install_package "htop" "htop" "htop"
+install_package "bpytop" "bpytop" "bpytop"
+install_package "tldr" "tldr" "tldr"
+install_package "rg" "ripgrep" "ripgrep"
+
+# fd: brew uses "fd", Ubuntu uses "fd-find" with binary "fdfind"
+if command -v fd &>/dev/null || command -v fdfind &>/dev/null; then
+  skip "fd"
+else
+  info "Installing fd..."
+  if [[ "$OS" == "Darwin" ]]; then
+    brew install fd && ok "fd" || fail "fd"
+  else
+    sudo apt-get install -y fd-find && ok "fd" || fail "fd"
+  fi
+fi
 
 # bat: different package names per OS
 if command -v bat &>/dev/null || command -v batcat &>/dev/null; then

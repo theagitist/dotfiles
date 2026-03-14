@@ -32,6 +32,11 @@ alias lg='lazygit'
 # Reload shell
 alias reload="exec zsh"
 
+# fd: fdfind on Debian/Ubuntu, fd on macOS/other
+if command -v fdfind &>/dev/null && ! command -v fd &>/dev/null; then
+    alias fd='fdfind'
+fi
+
 # Changing "cat" to "bat" (batcat on Debian/Ubuntu, bat on macOS/other)
 if command -v batcat &>/dev/null; then
     alias cat='batcat -p'
