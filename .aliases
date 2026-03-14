@@ -1,0 +1,40 @@
+# Dotfiles management
+alias dot='git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
+
+# General aliases
+alias zipthis='f() { zip -r "${1:-$(basename $PWD)}.zip" .; }; f'
+alias whatsmypublicipv4="dig -4 TXT +short +time=5 +tries=1 o-o.myaddr.l.google.com @ns1.google.com | tr -d '\"'"
+alias whatsmypublicipv6="curl --max-time 5 https://get.geojs.io/v1/ip"
+
+# Changing "ls" to "eza"
+if command -v eza &>/dev/null; then
+    alias la='eza -al --color=always --group-directories-first'
+    alias ls='eza -a --color=always --group-directories-first'
+    alias ll='eza -l --color=always --group-directories-first'
+    alias lt='eza -aT --color=always --group-directories-first'
+fi
+
+# Navigation
+alias ..='cd ..'
+alias ...='cd ../..'
+
+# Quick edit configs
+alias zshrc='$EDITOR ~/.zshrc'
+alias aliases='$EDITOR ~/.aliases'
+alias tmuxconf='$EDITOR ~/.tmux.conf'
+
+# System info
+alias ports="sudo lsof -i -P -n | grep LISTEN"
+
+# Reload shell
+alias reload="exec zsh"
+
+# Changing "cat" to "bat" (batcat on Debian/Ubuntu, bat on macOS/other)
+if command -v batcat &>/dev/null; then
+    alias cat='batcat -p'
+    alias ccat='batcat'
+elif command -v bat &>/dev/null; then
+    alias cat='bat -p'
+    alias ccat='bat'
+fi
+
