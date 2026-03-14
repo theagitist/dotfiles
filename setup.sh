@@ -208,6 +208,32 @@ if [[ "$OS" != "Darwin" ]]; then
   fi
 fi
 
+# ── Timezone ──
+
+echo "\n── Timezone ──"
+DESIRED_TZ="America/Vancouver"
+CURRENT_TZ=$(cat /etc/timezone 2>/dev/null || readlink /etc/localtime 2>/dev/null | sed 's|.*/zoneinfo/||')
+if [[ "$CURRENT_TZ" == "$DESIRED_TZ" ]]; then
+  skip "timezone ($DESIRED_TZ)"
+else
+  info "Setting timezone to $DESIRED_TZ..."
+  if [[ "$OS" == "Darwin" ]]; then
+    sudo systemsetup -settimezone "$DESIRED_TZ" 2>/dev/null && ok "timezone" || fail "timezone"
+  else
+    sudo timedatectl set-timezone "$DESIRED_TZ" && ok "timezone" || fail "timezone"
+  fi
+fi
+
+# ── Cron: weekly update ──
+
+echo "\n── Cron ──"
+if crontab -l 2>/dev/null | grep -q "update.sh"; then
+  skip "weekly update cron"
+else
+  info "Adding weekly update cron (Saturday midnight)..."
+  (crontab -l 2>/dev/null; echo "0 0 * * 6 $HOME/update.sh >> $HOME/.local/log/update-cron.log 2>&1") | crontab - && ok "weekly update cron" || fail "weekly update cron"
+fi
+
 # ── Summary ──
 
 echo "\n"
