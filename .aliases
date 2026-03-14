@@ -26,6 +26,9 @@ alias tmuxconf='$EDITOR ~/.tmux.conf'
 # System info
 alias ports="sudo lsof -i -P -n | grep LISTEN"
 
+# Git
+alias lg='lazygit'
+
 # Reload shell
 alias reload="exec zsh"
 
