@@ -97,6 +97,10 @@ bindkey '^R' history-incremental-search-backward
 
 [ -f "$HOME/.fzf.zsh" ] && source "$HOME/.fzf.zsh" || eval "$(fzf --zsh 2>/dev/null)"
 
+# ── direnv ──
+
+command -v direnv &>/dev/null && eval "$(direnv hook zsh)"
+
 # ── Aliases ──
 
 [ -f "$HOME/.aliases" ] && source "$HOME/.aliases"

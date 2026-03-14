@@ -24,8 +24,22 @@ alias grep='grep --color=auto'
 
 # Quick edit configs
 alias zshrc='$EDITOR ~/.zshrc'
+alias vimrc='$EDITOR ~/.vimrc'
+alias gitconf='$EDITOR ~/.gitconfig'
 alias aliases='$EDITOR ~/.aliases'
 alias tmuxconf='$EDITOR ~/.tmux.conf'
+
+# Safe delete (trash instead of rm)
+if command -v trash-put &>/dev/null; then
+    alias rm='trash-put'
+elif command -v trash &>/dev/null; then
+    alias rm='trash'
+fi
+
+# Disk usage
+if command -v duf &>/dev/null; then
+    alias df='duf'
+fi
 
 # System info
 alias ports="sudo lsof -i -P -n | grep LISTEN"

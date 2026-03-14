@@ -113,6 +113,23 @@ install_package "tldr" "tldr" "tldr"
 install_package "rg" "ripgrep" "ripgrep"
 install_package "jq" "jq" "jq"
 install_package "w3m" "w3m" "w3m"
+install_package "duf" "duf" "duf"
+install_package "entr" "entr" "entr"
+
+# trash-cli
+if command -v trash &>/dev/null || command -v trash-put &>/dev/null; then
+  skip "trash-cli"
+else
+  info "Installing trash-cli..."
+  if [[ "$OS" == "Darwin" ]]; then
+    brew install trash-cli && ok "trash-cli" || fail "trash-cli"
+  else
+    sudo apt-get install -y trash-cli && ok "trash-cli" || fail "trash-cli"
+  fi
+fi
+
+# direnv
+install_package "direnv" "direnv" "direnv"
 
 # fzf
 echo "\n── fzf ──"
