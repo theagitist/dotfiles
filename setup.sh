@@ -130,6 +130,25 @@ fi
 
 # direnv
 install_package "direnv" "direnv" "direnv"
+install_package "yq" "yq" "yq"
+install_package "glow" "glow" "glow"
+
+# curlie
+if command -v curlie &>/dev/null; then
+  skip "curlie"
+else
+  info "Installing curlie..."
+  if [[ "$OS" == "Darwin" ]]; then
+    brew install curlie && ok "curlie" || fail "curlie"
+  else
+    CURLIE_VERSION=$(curl -s "https://api.github.com/repos/rs/curlie/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+    curl -Lo /tmp/curlie.tar.gz "https://github.com/rs/curlie/releases/latest/download/curlie_${CURLIE_VERSION}_linux_amd64.tar.gz" && \
+      tar xf /tmp/curlie.tar.gz -C /tmp curlie && \
+      sudo install /tmp/curlie /usr/local/bin && \
+      rm -f /tmp/curlie /tmp/curlie.tar.gz && \
+      ok "curlie" || fail "curlie"
+  fi
+fi
 
 # fzf
 echo "\n── fzf ──"

@@ -37,11 +37,11 @@ dot push
 
 | File | Description |
 |---|---|
-| `.zshrc` | zsh with Dracula theme, oh-my-zsh plugins, lazy-loaded nvm, bun, fzf, direnv, vi mode with cursor shape indicators, AUTO_CD, CORRECT, history settings, macOS/Linux guards |
+| `.zshrc` | zsh with Dracula theme, oh-my-zsh plugins, lazy-loaded nvm, bun, fzf, direnv, SSH agent, vi mode with cursor shape indicators, AUTO_CD, CORRECT, history settings, macOS/Linux guards |
 | `.vimrc` | vim config with vim-plug, coc.nvim, fzf, NERDTree, fugitive, Dracula theme, persistent undo, Space leader |
 | `.tmux.conf` | tmux with vi mode, Dracula theme, resurrect/continuum, thumbs (quick-copy), prefix-less Alt bindings, pane border labels, auto-rename windows, security hardening, cross-platform lock |
 | `.gitconfig` | shared git config with delta pager (side-by-side, Dracula), histogram diffs, aliases (switch/restore), auto-stash rebase, auto-setup remote, rerere, diff3 merge, local include for machine-specific settings |
-| `.aliases` | portable aliases for eza, bat, fd, zoxide, lazygit, trash-cli, duf, mkcd, grep color, config editing, system info |
+| `.aliases` | portable aliases for eza, bat, fd, zoxide, lazygit, trash-cli, duf, curlie, mkcd, grep color, config editing, system info |
 | `setup.sh` | idempotent bootstrap script — installs all dependencies, sets timezone, adds weekly update cron |
 | `update.sh` | system maintenance script — updates packages, bun, node, tmux plugins, renews certs, cleans git branches, logs to `~/.local/log` |
 
@@ -55,7 +55,7 @@ All managed by `setup.sh`:
 - [nvm](https://github.com/nvm-sh/nvm) + Node.js (lazy-loaded)
 - [bun](https://bun.sh)
 - [delta](https://github.com/dandavison/delta), [eza](https://github.com/eza-community/eza), [bat](https://github.com/sharkdp/bat), [zoxide](https://github.com/ajeetdsouza/zoxide), [fd](https://github.com/sharkdp/fd), [ripgrep](https://github.com/BurntSushi/ripgrep), [fzf](https://github.com/junegunn/fzf), [jq](https://github.com/jqlang/jq), [duf](https://github.com/muesli/duf), [entr](https://github.com/eradman/entr), [w3m](https://w3m.sourceforge.net)
-- [trash-cli](https://github.com/andreafrancia/trash-cli), [direnv](https://direnv.net)
+- [trash-cli](https://github.com/andreafrancia/trash-cli), [direnv](https://direnv.net), [curlie](https://github.com/rs/curlie), [yq](https://github.com/mikefarah/yq), [glow](https://github.com/charmbracelet/glow)
 - [lazygit](https://github.com/jesseduffield/lazygit), [gh](https://cli.github.com), [git-extras](https://github.com/tj/git-extras)
 - [ncdu](https://dev.yorhel.nl/ncdu), [htop](https://htop.dev), [bpytop](https://github.com/aristocratos/bpytop), [tldr](https://tldr.sh)
 - [awscli](https://aws.amazon.com/cli/)

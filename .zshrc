@@ -93,6 +93,19 @@ zle -N zle-line-init
 # Keep Ctrl+R for reverse history search (vi mode disables it)
 bindkey '^R' history-incremental-search-backward
 
+# ── SSH agent ──
+
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  # macOS: use built-in agent with Keychain integration
+  ssh-add --apple-use-keychain 2>/dev/null
+else
+  # Linux: start agent if not already running
+  if [[ -z "$SSH_AUTH_SOCK" ]]; then
+    eval "$(ssh-agent -s)" >/dev/null
+    ssh-add 2>/dev/null
+  fi
+fi
+
 # ── fzf ──
 
 [ -f "$HOME/.fzf.zsh" ] && source "$HOME/.fzf.zsh" || eval "$(fzf --zsh 2>/dev/null)"

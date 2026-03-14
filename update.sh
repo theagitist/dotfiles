@@ -260,6 +260,24 @@ if [[ "$OS" != "Darwin" ]]; then
     fi
   fi
 
+  # curlie
+  if command -v curlie &>/dev/null; then
+    echo "\n→ Checking curlie updates..."
+    current_curlie=$(curlie --version 2>/dev/null | grep -Po '[\d.]+' | head -1 || echo "0")
+    latest_curlie=$(curl -s "https://api.github.com/repos/rs/curlie/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+    if [[ -n "$latest_curlie" && "$current_curlie" != "$latest_curlie" ]]; then
+      run "Updating curlie ($current_curlie → $latest_curlie)" bash -c "
+        curl -Lo /tmp/curlie.tar.gz \"https://github.com/rs/curlie/releases/latest/download/curlie_\${1}_linux_amd64.tar.gz\" && \
+        tar xf /tmp/curlie.tar.gz -C /tmp curlie && \
+        sudo install /tmp/curlie /usr/local/bin && \
+        rm -f /tmp/curlie /tmp/curlie.tar.gz
+      " -- "$latest_curlie"
+    else
+      echo "  ✓ curlie $current_curlie is latest"
+      SKIPPED+=("curlie (already up to date)")
+    fi
+  fi
+
   # fzf (if installed from GitHub, not apt)
   if command -v fzf &>/dev/null && [[ -d "$HOME/.fzf" ]]; then
     run "Updating fzf" bash -c "cd $HOME/.fzf && git pull && ./install --key-bindings --completion --no-update-rc"
