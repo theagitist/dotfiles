@@ -164,6 +164,22 @@ install_package "curl" "curl" "curl"
 install_package "dig" "bind" "dnsutils"
 install_package "zip" "zip" "zip"
 install_package "git-extras" "git-extras" "git-extras"
+# lazygit: brew on macOS, binary release on Linux
+if command -v lazygit &>/dev/null; then
+  skip "lazygit"
+else
+  info "Installing lazygit..."
+  if [[ "$OS" == "Darwin" ]]; then
+    brew install lazygit && ok "lazygit" || fail "lazygit"
+  else
+    LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+    curl -Lo /tmp/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz" && \
+      tar xf /tmp/lazygit.tar.gz -C /tmp lazygit && \
+      sudo install /tmp/lazygit /usr/local/bin && \
+      rm -f /tmp/lazygit /tmp/lazygit.tar.gz && \
+      ok "lazygit" || fail "lazygit"
+  fi
+fi
 install_package "aws" "awscli" "awscli"
 
 # ── tmux + TPM ──
