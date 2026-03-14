@@ -12,8 +12,12 @@
 [pull]
     rebase = true
 
+[rebase]
+    autoStash = true
+
 [push]
     default = current
+    autoSetupRemote = true
 
 [fetch]
     prune = true
@@ -48,3 +52,6 @@
     last = log -1 HEAD --stat
     unstage = reset HEAD --
     amend = commit --amend --no-edit
+    sw = switch
+    rs = restore
+    sc = switch -c

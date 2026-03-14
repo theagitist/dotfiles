@@ -81,6 +81,13 @@ else
   git clone https://github.com/zsh-users/zsh-autosuggestions.git "$ZSH_CUSTOM/plugins/zsh-autosuggestions" && ok "zsh-autosuggestions" || fail "zsh-autosuggestions"
 fi
 
+if [[ -d "$ZSH_CUSTOM/plugins/you-should-use" ]]; then
+  skip "you-should-use"
+else
+  info "Installing you-should-use..."
+  git clone https://github.com/MichaelAquilina/zsh-you-should-use.git "$ZSH_CUSTOM/plugins/you-should-use" && ok "you-should-use" || fail "you-should-use"
+fi
+
 # ── Oh My Zsh Dracula theme ──
 
 echo "\n── Dracula Theme ──"
