@@ -1,6 +1,12 @@
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
+# ── PATH (before oh-my-zsh so plugins can find binaries) ──
+
+export PATH="$HOME/.local/bin:$PATH"
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
 ZSH_THEME="dracula"
 
 plugins=(
@@ -31,14 +37,6 @@ export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export EDITOR=vim
 export SUDO_EDITOR="vim -u NONE"
-
-# ── PATH ──
-
-export PATH="$HOME/.local/bin:$PATH"
-
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
 
 # ── nvm ──
 
