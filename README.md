@@ -1,6 +1,6 @@
 # dotfiles
 
-![version](https://img.shields.io/badge/version-0.0.1-blue)
+![version](https://img.shields.io/badge/version-0.1.0-blue)
 
 Personal configuration files and maintenance scripts. Designed to work on both Linux and macOS.
 
