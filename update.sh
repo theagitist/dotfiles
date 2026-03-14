@@ -13,6 +13,14 @@ UPDATED=()
 SKIPPED=()
 START_TIME=$SECONDS
 
+# ── Logging (keep last 30 days) ──
+
+LOG_DIR="$HOME/.local/log"
+[[ -d "$LOG_DIR" ]] || mkdir -p "$LOG_DIR"
+LOG="$LOG_DIR/update-$(date +%Y%m%d-%H%M).log"
+find "$LOG_DIR" -name "update-*.log" -mtime +30 -delete 2>/dev/null
+exec > >(tee -a "$LOG") 2>&1
+
 run() {
   local label="$1"
   shift
@@ -41,11 +49,14 @@ fi
 if [[ "$OS" == "Darwin" ]]; then
   if command -v brew &>/dev/null; then
     echo "\n→ Updating Homebrew packages..."
-    brew update
-    brew upgrade || true
-    brew cleanup 2>/dev/null || true
-    UPDATED+=("Homebrew packages")
-    echo "  ✓ Done"
+    if brew update && brew upgrade; then
+      brew cleanup 2>/dev/null || true
+      UPDATED+=("Homebrew packages")
+      echo "  ✓ Done"
+    else
+      ERRORS+=("Homebrew packages")
+      echo "  ✗ Failed (continuing...)"
+    fi
   fi
 
   # Mac App Store
@@ -53,20 +64,25 @@ if [[ "$OS" == "Darwin" ]]; then
     echo "\n→ Updating Mac App Store apps..."
     if mas upgrade; then
       UPDATED+=("Mac App Store apps")
+      echo "  ✓ Done"
     else
       ERRORS+=("Mac App Store updates")
+      echo "  ✗ Failed (continuing...)"
     fi
-    echo "  ✓ Done"
   else
     SKIPPED+=("Mac App Store (mas not installed)")
   fi
 else
   if command -v apt &>/dev/null; then
     echo "\n→ Updating system packages..."
-    sudo apt update && sudo apt upgrade -y
-    sudo apt autoremove -y 2>/dev/null || true
-    UPDATED+=("System packages (apt)")
-    echo "  ✓ Done"
+    if sudo apt update && sudo apt upgrade -y; then
+      sudo apt autoremove -y 2>/dev/null || true
+      UPDATED+=("System packages (apt)")
+      echo "  ✓ Done"
+    else
+      ERRORS+=("System packages (apt)")
+      echo "  ✗ Failed (continuing...)"
+    fi
   fi
 fi
 
@@ -84,12 +100,22 @@ if command -v npm &>/dev/null; then
     SKIPPED+=("npm global (already up to date)")
   else
     if [[ "$OS" == "Darwin" ]]; then
-      npm update -g || ERRORS+=("Updating global npm packages")
+      if npm update -g; then
+        UPDATED+=("npm global packages")
+        echo "  ✓ Done"
+      else
+        ERRORS+=("npm global packages")
+        echo "  ✗ Failed (continuing...)"
+      fi
     else
-      sudo npm update -g || ERRORS+=("Updating global npm packages")
+      if sudo npm update -g; then
+        UPDATED+=("npm global packages")
+        echo "  ✓ Done"
+      else
+        ERRORS+=("npm global packages")
+        echo "  ✗ Failed (continuing...)"
+      fi
     fi
-    UPDATED+=("npm global packages")
-    echo "  ✓ Done"
   fi
 fi
 
@@ -103,9 +129,13 @@ if command -v pip3 &>/dev/null; then
       echo "  ✓ All pip packages up to date"
       SKIPPED+=("pip (already up to date)")
     else
-      echo "$outdated_pip" | python3 -c "import sys,json; [print(p['name']) for p in json.load(sys.stdin)]" | xargs -r pip3 install --upgrade --break-system-packages 2>/dev/null || ERRORS+=("Updating pip packages")
-      UPDATED+=("pip packages")
-      echo "  ✓ Done"
+      if echo "$outdated_pip" | python3 -c "import sys,json; [print(p['name']) for p in json.load(sys.stdin)]" | xargs -r pip3 install --user --upgrade 2>/dev/null; then
+        UPDATED+=("pip packages")
+        echo "  ✓ Done"
+      else
+        ERRORS+=("pip packages")
+        echo "  ✗ Failed (continuing...)"
+      fi
     fi
   else
     # Linux: only user-installed packages (system ones managed by apt)
@@ -114,9 +144,13 @@ if command -v pip3 &>/dev/null; then
       echo "  ✓ No outdated user pip packages"
       SKIPPED+=("pip user packages (already up to date)")
     else
-      echo "$pip_names" | xargs pip3 install --user --upgrade 2>/dev/null || ERRORS+=("Updating pip packages")
-      UPDATED+=("pip user packages")
-      echo "  ✓ Done"
+      if echo "$pip_names" | xargs pip3 install --user --upgrade 2>/dev/null; then
+        UPDATED+=("pip user packages")
+        echo "  ✓ Done"
+      else
+        ERRORS+=("pip user packages")
+        echo "  ✗ Failed (continuing...)"
+      fi
     fi
   fi
 fi
@@ -127,10 +161,11 @@ if command -v composer &>/dev/null; then
   echo "\n→ Updating Composer global packages..."
   if composer global update --no-interaction 2>/dev/null; then
     UPDATED+=("Composer global packages")
+    echo "  ✓ Done"
   else
     ERRORS+=("Composer global update")
+    echo "  ✗ Failed (continuing...)"
   fi
-  echo "  ✓ Done"
 else
   SKIPPED+=("Composer (not installed)")
 fi
@@ -168,9 +203,9 @@ if [[ -d ~/.claude/.git ]]; then
     cd ~/.claude
     git pull --rebase
     if [[ -n "$(git status --porcelain)" ]]; then
-      git add -A
-      git commit -m "sync $(hostname) $(date +%Y-%m-%d)"
-      git push
+      git diff --name-only --cached
+      git diff --name-only
+      echo "  ⚠ Uncommitted changes in ~/.claude — review before committing"
     fi
     echo "  ✓ Done"
   ) || { ERRORS+=("Claude Code sync"); echo "  ✗ Failed (continuing...)" }
@@ -297,6 +332,8 @@ fi
 printf "╚"
 printf '═%.0s' {1..$W}
 printf "╝\n"
+
+echo "\nLog saved to: $LOG"
 
 if (( ${#ERRORS[@]} > 0 )); then
   exit 1
