@@ -17,7 +17,7 @@ plugins=(
     sudo
     zoxide
     extract
-    dirhistory
+    # dirhistory
     copypath
     history-substring-search
     you-should-use
