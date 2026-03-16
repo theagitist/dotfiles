@@ -20,7 +20,7 @@ plugins=(
     # dirhistory
     copypath
     history-substring-search
-    you-should-use
+
     zsh-syntax-highlighting
     zsh-autosuggestions
 )
