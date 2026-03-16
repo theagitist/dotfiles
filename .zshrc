@@ -27,6 +27,8 @@ plugins=(
 
 source "$ZSH/oh-my-zsh.sh"
 
+unsetopt AUTO_CD
+
 # ── History ──
 
 HISTSIZE=50000
