@@ -37,7 +37,7 @@ dot push
 
 | File | Description |
 |---|---|
-| `.zshrc` | zsh with Dracula theme, oh-my-zsh plugins, lazy-loaded nvm, bun, fzf, direnv, SSH agent, vi mode with cursor shape indicators, AUTO_CD, CORRECT, history settings, macOS/Linux guards |
+| `.zshrc` | zsh with Dracula theme, oh-my-zsh plugins, lazy-loaded nvm, bun, fzf, direnv, SSH agent, vi mode with cursor shape indicators, CORRECT, history settings, macOS/Linux guards |
 | `.vimrc` | vim config with vim-plug, coc.nvim, fzf, NERDTree, fugitive, Dracula theme, persistent undo, Space leader |
 | `.tmux.conf` | tmux with vi mode, Dracula theme, resurrect/continuum, thumbs (quick-copy), prefix-less Alt bindings, pane border labels, auto-rename windows, security hardening, cross-platform lock |
 | `.gitconfig` | shared git config with delta pager (side-by-side, Dracula), histogram diffs, aliases (switch/restore), auto-stash rebase, auto-setup remote, rerere, diff3 merge, local include for machine-specific settings |
@@ -49,7 +49,7 @@ dot push
 
 All managed by `setup.sh`:
 
-- [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh) + Dracula theme, zsh-syntax-highlighting, zsh-autosuggestions, [you-should-use](https://github.com/MichaelAquilina/zsh-you-should-use), extract, dirhistory, copypath
+- [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh) + Dracula theme, zsh-syntax-highlighting, zsh-autosuggestions, extract, dirhistory, copypath
 - [vim](https://www.vim.org) + [vim-plug](https://github.com/junegunn/vim-plug) + [coc.nvim](https://github.com/neoclide/coc.nvim)
 - [tmux](https://github.com/tmux/tmux) + [TPM](https://github.com/tmux-plugins/tpm) (resurrect, continuum, yank, menus, [thumbs](https://github.com/fcsonline/tmux-thumbs))
 - [nvm](https://github.com/nvm-sh/nvm) + Node.js (lazy-loaded)
