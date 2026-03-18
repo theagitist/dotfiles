@@ -110,7 +110,8 @@ fi
 
 # ── fzf ──
 
-[ -f "$HOME/.fzf.zsh" ] && source "$HOME/.fzf.zsh" || eval "$(fzf --zsh 2>/dev/null)"
+source /usr/share/doc/fzf/examples/key-bindings.zsh
+source /usr/share/doc/fzf/examples/completion.zsh
 
 # ── direnv ──
 

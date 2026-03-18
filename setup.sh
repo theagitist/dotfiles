@@ -81,13 +81,6 @@ else
   git clone https://github.com/zsh-users/zsh-autosuggestions.git "$ZSH_CUSTOM/plugins/zsh-autosuggestions" && ok "zsh-autosuggestions" || fail "zsh-autosuggestions"
 fi
 
-if [[ -d "$ZSH_CUSTOM/plugins/you-should-use" ]]; then
-  skip "you-should-use"
-else
-  info "Installing you-should-use..."
-  git clone https://github.com/MichaelAquilina/zsh-you-should-use.git "$ZSH_CUSTOM/plugins/you-should-use" && ok "you-should-use" || fail "you-should-use"
-fi
-
 # ── Oh My Zsh Dracula theme ──
 
 echo "\n── Dracula Theme ──"
@@ -115,18 +108,6 @@ install_package "jq" "jq" "jq"
 install_package "w3m" "w3m" "w3m"
 install_package "duf" "duf" "duf"
 install_package "entr" "entr" "entr"
-
-# trash-cli
-if command -v trash &>/dev/null || command -v trash-put &>/dev/null; then
-  skip "trash-cli"
-else
-  info "Installing trash-cli..."
-  if [[ "$OS" == "Darwin" ]]; then
-    brew install trash-cli && ok "trash-cli" || fail "trash-cli"
-  else
-    sudo apt-get install -y trash-cli && ok "trash-cli" || fail "trash-cli"
-  fi
-fi
 
 # direnv
 install_package "direnv" "direnv" "direnv"
