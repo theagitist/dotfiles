@@ -181,7 +181,7 @@ if command -v pip3 &>/dev/null; then
       echo "  ✓ All pip packages up to date"
       SKIPPED+=("pip (already up to date)")
     else
-      if echo "$outdated_pip" | python3 -c "import sys,json; [print(p['name']) for p in json.load(sys.stdin)]" | xargs -r pip3 install --user --upgrade 2>/dev/null; then
+      if echo "$outdated_pip" | python3 -c "import sys,json; [print(p['name']) for p in json.load(sys.stdin)]" | xargs pip3 install --user --upgrade 2>/dev/null; then
         UPDATED+=("pip packages")
         echo "  ✓ Done"
       else
