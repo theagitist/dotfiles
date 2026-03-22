@@ -278,6 +278,19 @@ if [[ "$OS" != "Darwin" ]]; then
     fi
   fi
 
+  # himalaya (cargo install updates if newer version available)
+  if command -v himalaya &>/dev/null && command -v cargo &>/dev/null; then
+    echo "\n→ Checking himalaya updates..."
+    current_himalaya=$(himalaya --version 2>/dev/null | awk '{print $2}' || echo "0")
+    latest_himalaya=$(gh api repos/pimalaya/himalaya/releases/latest --jq '.tag_name' 2>/dev/null | sed 's/^v//')
+    if [[ -n "$latest_himalaya" && "$current_himalaya" != "$latest_himalaya" ]]; then
+      run "Updating himalaya ($current_himalaya → $latest_himalaya)" cargo install himalaya --features oauth2 --locked
+    else
+      echo "  ✓ himalaya $current_himalaya is latest"
+      SKIPPED+=("himalaya (already up to date)")
+    fi
+  fi
+
   # fzf (if installed from GitHub, not apt)
   if command -v fzf &>/dev/null && [[ -d "$HOME/.fzf" ]]; then
     run "Updating fzf" bash -c "cd $HOME/.fzf && git pull && ./install --key-bindings --completion --no-update-rc"

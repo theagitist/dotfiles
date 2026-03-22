@@ -113,6 +113,20 @@ install_package "entr" "entr" "entr"
 install_package "direnv" "direnv" "direnv"
 install_package "yq" "yq" "yq"
 install_package "glow" "glow" "glow"
+install_package "aerc" "aerc" "aerc"
+install_package "pass" "pass" "pass"
+
+# himalaya (CLI email client — built with OAuth2 support)
+if command -v himalaya &>/dev/null; then
+  skip "himalaya"
+else
+  info "Installing himalaya (via cargo, this may take a while)..."
+  if command -v cargo &>/dev/null; then
+    cargo install himalaya --features oauth2 --locked && ok "himalaya" || fail "himalaya"
+  else
+    fail "himalaya (cargo not installed)"
+  fi
+fi
 
 # curlie
 if command -v curlie &>/dev/null; then
