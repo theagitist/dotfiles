@@ -5,7 +5,7 @@ export ZSH="$HOME/.oh-my-zsh"
 
 export PATH="$HOME/.local/bin:$PATH"
 export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
+export PATH="$BUN_INSTALL/bin:/snap/bin:$PATH"
 
 ZSH_THEME="dracula"
 

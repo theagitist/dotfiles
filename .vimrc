@@ -122,6 +122,8 @@ nnoremap <leader><space> :nohlsearch<CR>
 " fzf
 nnoremap <C-p> :Files<Cr>
 
+let g:coc_node_path = split(globpath(expand('~/.nvm/versions/node'), '*/bin/node'), "\n")[-1]
+
 " Remaps for coc.nvim
 nmap <silent> <leader>cd <Plug>(coc-definition)
 nmap <silent> <leader>cr <Plug>(coc-references)
