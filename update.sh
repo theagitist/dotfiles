@@ -230,7 +230,7 @@ if [[ "$OS" != "Darwin" ]]; then
   # lazygit
   if command -v lazygit &>/dev/null; then
     echo "\n→ Checking lazygit updates..."
-    current_lg=$(lazygit --version 2>/dev/null | grep -Po 'version=\K[^,]+' || echo "0")
+    current_lg=$(lazygit --version 2>/dev/null | grep -Po '(?<=, )version=\K[^,]+' || echo "0")
     latest_lg=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
     if [[ -n "$latest_lg" && "$current_lg" != "$latest_lg" ]]; then
       run "Updating lazygit ($current_lg → $latest_lg)" bash -c "
@@ -265,7 +265,7 @@ if [[ "$OS" != "Darwin" ]]; then
   # curlie
   if command -v curlie &>/dev/null; then
     echo "\n→ Checking curlie updates..."
-    current_curlie=$(curlie --version 2>/dev/null | grep -Po '[\d.]+' | head -1 || echo "0")
+    current_curlie=$(curlie version 2>/dev/null | grep -Po '[\d.]+' | head -1 || echo "0")
     latest_curlie=$(curl -s "https://api.github.com/repos/rs/curlie/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
     if [[ -n "$latest_curlie" && "$current_curlie" != "$latest_curlie" ]]; then
       run "Updating curlie ($current_curlie → $latest_curlie)" bash -c "
@@ -283,7 +283,7 @@ if [[ "$OS" != "Darwin" ]]; then
   # himalaya (cargo install updates if newer version available)
   if command -v himalaya &>/dev/null && command -v cargo &>/dev/null; then
     echo "\n→ Checking himalaya updates..."
-    current_himalaya=$(himalaya --version 2>/dev/null | awk '{print $2}' || echo "0")
+    current_himalaya=$(himalaya --version 2>/dev/null | head -1 | awk '{print $2}' | sed 's/^v//' || echo "0")
     latest_himalaya=$(gh api repos/pimalaya/himalaya/releases/latest --jq '.tag_name' 2>/dev/null | sed 's/^v//')
     if [[ -n "$latest_himalaya" && "$current_himalaya" != "$latest_himalaya" ]]; then
       run "Updating himalaya ($current_himalaya → $latest_himalaya)" cargo install himalaya --features oauth2 --locked
@@ -511,6 +511,10 @@ W=48  # inner width between ║ chars
 
 row() {
   local text="$1"
+  # Truncate if too long for the box
+  if (( ${#text} > W )); then
+    text="${text:0:$((W-1))}…"
+  fi
   local pad=$(( W - ${#text} ))
   (( pad < 0 )) && pad=0
   printf "║%s%*s║\n" "$text" "$pad" ""
