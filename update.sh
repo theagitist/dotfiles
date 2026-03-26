@@ -310,6 +310,17 @@ if [[ "$OS" != "Darwin" ]]; then
     run "Renewing SSL certificates" sudo certbot renew
   fi
 
+  # Syncthing: ensure service is running
+  if command -v syncthing &>/dev/null; then
+    echo "\n→ Checking syncthing service..."
+    if systemctl --user is-active syncthing.service &>/dev/null; then
+      echo "  ✓ syncthing service is running"
+      SKIPPED+=("syncthing (running)")
+    else
+      run "Restarting syncthing service" systemctl --user start syncthing.service
+    fi
+  fi
+
   # Check for failed systemd services
   echo "\n→ Checking systemd services..."
   failed=$(systemctl --failed --no-legend 2>/dev/null)

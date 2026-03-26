@@ -264,6 +264,17 @@ else
   fi
 fi
 install_package "aws" "awscli" "awscli"
+install_package "syncthing" "syncthing" "syncthing"
+
+# Enable syncthing as a user service (Linux only)
+if [[ "$OS" != "Darwin" ]]; then
+  if ! systemctl --user is-enabled syncthing.service &>/dev/null; then
+    info "Enabling syncthing user service..."
+    systemctl --user enable syncthing.service && systemctl --user start syncthing.service && ok "syncthing service" || fail "syncthing service"
+  else
+    skip "syncthing service"
+  fi
+fi
 
 # ── tmux + TPM ──
 
