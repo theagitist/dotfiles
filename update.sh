@@ -507,7 +507,7 @@ fi
 ELAPSED=$(( SECONDS - START_TIME ))
 MINS=$(( ELAPSED / 60 ))
 SECS=$(( ELAPSED % 60 ))
-W=48  # inner width between ║ chars
+W=$(( $(tput cols 2>/dev/null || echo 80) - 2 ))  # terminal width minus ║ borders
 
 row() {
   local text="$1"
