@@ -144,6 +144,11 @@ fi
 
 # ── Shared: npm global packages ──
 
+# Ensure nvm is loaded so npm is on PATH (needed after node upgrades)
+if [[ -s "$NVM_DIR/nvm.sh" ]] && ! command -v npm &>/dev/null; then
+  source "$NVM_DIR/nvm.sh"
+fi
+
 if command -v npm &>/dev/null; then
   echo "\n→ Updating global npm packages..."
   outdated=$(npm outdated -g --json 2>/dev/null)
@@ -151,22 +156,13 @@ if command -v npm &>/dev/null; then
     echo "  ✓ All global packages up to date"
     SKIPPED+=("npm global (already up to date)")
   else
-    if [[ "$OS" == "Darwin" ]]; then
-      if npm update -g; then
-        UPDATED+=("npm global packages")
-        echo "  ✓ Done"
-      else
-        ERRORS+=("npm global packages")
-        echo "  ✗ Failed (continuing...)"
-      fi
+    # Use npm directly (not sudo) — nvm-managed npm isn't in sudo's PATH
+    if npm update -g; then
+      UPDATED+=("npm global packages")
+      echo "  ✓ Done"
     else
-      if sudo npm update -g; then
-        UPDATED+=("npm global packages")
-        echo "  ✓ Done"
-      else
-        ERRORS+=("npm global packages")
-        echo "  ✗ Failed (continuing...)"
-      fi
+      ERRORS+=("npm global packages")
+      echo "  ✗ Failed (continuing...)"
     fi
   fi
 fi
@@ -210,13 +206,18 @@ fi
 # ── Shared: Composer global packages ──
 
 if command -v composer &>/dev/null; then
-  echo "\n→ Updating Composer global packages..."
-  if composer global update --no-interaction 2>/dev/null; then
-    UPDATED+=("Composer global packages")
-    echo "  ✓ Done"
+  COMPOSER_HOME="${COMPOSER_HOME:-$(composer global config home 2>/dev/null)}"
+  if [[ -f "$COMPOSER_HOME/composer.json" ]]; then
+    echo "\n→ Updating Composer global packages..."
+    if composer global update --no-interaction 2>/dev/null; then
+      UPDATED+=("Composer global packages")
+      echo "  ✓ Done"
+    else
+      ERRORS+=("Composer global update")
+      echo "  ✗ Failed (continuing...)"
+    fi
   else
-    ERRORS+=("Composer global update")
-    echo "  ✗ Failed (continuing...)"
+    SKIPPED+=("Composer global (no packages installed)")
   fi
 else
   SKIPPED+=("Composer (not installed)")
@@ -307,7 +308,11 @@ fi
 
 if [[ "$OS" != "Darwin" ]]; then
   if command -v certbot &>/dev/null; then
-    run "Renewing SSL certificates" sudo certbot renew
+    if sudo certbot certificates 2>/dev/null | grep -q "Certificate Name"; then
+      run "Renewing SSL certificates" sudo certbot renew
+    else
+      SKIPPED+=("SSL certificates (none configured)")
+    fi
   fi
 
   # Syncthing: ensure service is running

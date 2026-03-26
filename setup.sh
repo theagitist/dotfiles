@@ -112,7 +112,20 @@ install_package "entr" "entr" "entr"
 # direnv
 install_package "direnv" "direnv" "direnv"
 install_package "yq" "yq" "yq"
-install_package "glow" "glow" "glow"
+# glow: not in default apt repos — needs Charm repo on Linux
+if command -v glow &>/dev/null; then
+  skip "glow"
+else
+  info "Installing glow..."
+  if [[ "$OS" == "Darwin" ]]; then
+    brew install glow && ok "glow" || fail "glow"
+  else
+    sudo mkdir -p /etc/apt/keyrings
+    curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+    echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list > /dev/null
+    sudo apt-get update && sudo apt-get install -y glow && ok "glow" || fail "glow"
+  fi
+fi
 install_package "aerc" "aerc" "aerc"
 install_package "pass" "pass" "pass"
 
