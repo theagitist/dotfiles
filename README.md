@@ -1,6 +1,6 @@
 # dotfiles
 
-![version](https://img.shields.io/badge/version-0.1.1-blue)
+![version](https://img.shields.io/badge/version-0.2.0-blue)
 
 Personal configuration files and maintenance scripts. Designed to work on both Linux and macOS.
 
@@ -43,7 +43,7 @@ dot push
 | `.gitconfig` | shared git config with delta pager (side-by-side, Dracula), histogram diffs, aliases (switch/restore), auto-stash rebase, auto-setup remote, rerere, diff3 merge, local include for machine-specific settings |
 | `.aliases` | portable aliases for eza, bat, fd, zoxide, lazygit, duf, curlie, mkcd, grep color, config editing, system info |
 | `setup.sh` | idempotent bootstrap script — installs all dependencies, sets timezone, adds weekly update cron |
-| `update.sh` | system maintenance script — updates packages, bun, node, tmux plugins, renews certs, cleans git branches, logs to `~/.local/log` |
+| `update.sh` | system maintenance script — updates packages, bun, node, tmux plugins, renews certs (auto-heals stuck locks, broken snap plugins, retries failed certs with `--force-renewal`), cleans git branches, logs to `~/.local/log` |
 
 ## Dependencies
 
@@ -59,4 +59,5 @@ All managed by `setup.sh`:
 - [lazygit](https://github.com/jesseduffield/lazygit), [gh](https://cli.github.com), [git-extras](https://github.com/tj/git-extras)
 - [ncdu](https://dev.yorhel.nl/ncdu), [htop](https://htop.dev), [bpytop](https://github.com/aristocratos/bpytop), [tldr](https://tldr.sh)
 - [awscli](https://aws.amazon.com/cli/)
-- Linux-only: nginx, certbot, vlock
+- certbot (cross-platform — snap or brew)
+- Linux-only: nginx, vlock

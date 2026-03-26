@@ -11,6 +11,7 @@ HOST="$(hostname -s 2>/dev/null || hostname)"
 ERRORS=()
 UPDATED=()
 SKIPPED=()
+CERT_WARNINGS=()
 START_TIME=$SECONDS
 
 # ── Logging (keep last 30 days) ──
@@ -304,17 +305,126 @@ if [[ "$OS" == "Darwin" ]]; then
   run "Checking macOS software updates" softwareupdate -l
 fi
 
-# ── Linux-only: Certbot & health checks ──
+# ── Shared: Certbot SSL renewal ──
+
+if command -v certbot &>/dev/null; then
+  if sudo certbot certificates 2>/dev/null | grep -q "Certificate Name"; then
+    # Kill any stuck certbot processes before renewing
+    if pgrep -f certbot &>/dev/null; then
+      echo "\n→ Killing stuck certbot processes..."
+      sudo pkill -9 -f certbot 2>/dev/null || true
+      sleep 2
+    fi
+
+    # Snap-specific: fix broken plugins and restart if needed
+    if command -v snap &>/dev/null && snap list certbot &>/dev/null 2>&1; then
+      # Check for disabled/broken certbot-dns-* plugins that block snap
+      broken_plugins=$(snap list --all 2>/dev/null | grep 'certbot-dns-' | grep 'disabled' | awk '{print $1}' | sort -u)
+      if [[ -n "$broken_plugins" ]]; then
+        echo "\n→ Fixing broken certbot snap plugins..."
+        for plugin in ${(f)broken_plugins}; do
+          echo "  → Removing broken $plugin"
+          sudo snap remove --purge "$plugin" 2>/dev/null || true
+        done
+        # Reinstall plugins cleanly
+        for plugin in ${(f)broken_plugins}; do
+          echo "  → Reinstalling $plugin"
+          sudo snap install "$plugin" 2>/dev/null || true
+          sudo snap connect certbot:plugin "$plugin" 2>/dev/null || true
+        done
+      fi
+      # Restart snap certbot to clear stale state
+      sudo snap restart certbot 2>/dev/null || true
+      sleep 1
+    fi
+
+    echo "\n→ Renewing SSL certificates..."
+    renew_output=$(sudo certbot renew --no-random-sleep-on-renew 2>&1)
+
+    # If "Another instance" persists after cleanup, retry once
+    if echo "$renew_output" | grep -q "Another instance of Certbot is already running"; then
+      echo "  ⚠ Lock conflict detected, retrying..."
+      sudo pkill -9 -f certbot 2>/dev/null || true
+      if command -v snap &>/dev/null && snap list certbot &>/dev/null 2>&1; then
+        sudo snap stop certbot 2>/dev/null || true
+        sudo snap start certbot 2>/dev/null || true
+      fi
+      sleep 3
+      renew_output=$(sudo certbot renew --no-random-sleep-on-renew 2>&1)
+    fi
+
+    echo "$renew_output"
+
+    if echo "$renew_output" | grep -q "Another instance of Certbot is already running"; then
+      ERRORS+=("SSL certificates (certbot lock — manual intervention needed)")
+      echo "  ✗ Certbot locked after retry"
+    else
+      # Parse failed cert names and attempt force-renewal for each
+      failed_certs=()
+      while IFS= read -r line; do
+        cert_name=$(echo "$line" | sed 's|.*/live/||;s|/.*||')
+        [[ -n "$cert_name" ]] && failed_certs+=("$cert_name")
+      done < <(echo "$renew_output" | grep '/etc/letsencrypt/live/.*\(failure\)')
+
+      fixed_certs=()
+      still_broken=()
+      if (( ${#failed_certs[@]} > 0 )); then
+        echo "\n→ Retrying ${#failed_certs[@]} failed certificate(s) with --force-renewal..."
+        for cert in "${failed_certs[@]}"; do
+          # Read the authenticator from the renewal config
+          auth=$(grep '^authenticator' "/etc/letsencrypt/renewal/${cert}.conf" 2>/dev/null | awk '{print $3}')
+          [[ -z "$auth" ]] && auth="nginx"
+          # Read domain(s) from the renewal config
+          domains=$(sudo certbot certificates --cert-name "$cert" 2>/dev/null | grep "Domains:" | sed 's/.*Domains: //')
+          [[ -z "$domains" ]] && domains="$cert"
+          # Build -d flags
+          d_flags=""
+          for d in ${(z)domains}; do
+            d_flags="$d_flags -d $d"
+          done
+
+          echo "  → Retrying $cert (authenticator: $auth)..."
+          retry_output=$(sudo certbot certonly --"$auth" $d_flags --force-renewal --non-interactive 2>&1)
+          if [[ $? -eq 0 ]]; then
+            echo "    ✓ Fixed"
+            fixed_certs+=("$cert")
+          else
+            # Extract the reason for the summary
+            reason=$(echo "$retry_output" | grep -E '(Detail:|error:)' | head -1 | sed 's/.*Detail: //;s/.*error: //' | cut -c1-60)
+            [[ -z "$reason" ]] && reason="unknown error"
+            echo "    ✗ Still failing: $reason"
+            still_broken+=("$cert")
+            CERT_WARNINGS+=("$cert — $reason")
+          fi
+        done
+      fi
+
+      renew_successes=$(echo "$renew_output" | grep -c "(success)" || true)
+      total_ok=$(( renew_successes + ${#fixed_certs[@]} ))
+      total_fail=${#still_broken[@]}
+
+      if (( total_fail > 0 && total_ok > 0 )); then
+        UPDATED+=("SSL certificates ($total_ok ok, $total_fail broken)")
+        echo "  ⚠ Partial: $total_ok renewed, $total_fail still failing"
+      elif (( total_fail > 0 )); then
+        ERRORS+=("SSL certificates ($total_fail broken)")
+        echo "  ✗ Failed (continuing...)"
+      elif (( total_ok > 0 )); then
+        UPDATED+=("SSL certificates ($total_ok renewed)")
+        echo "  ✓ Done"
+      else
+        UPDATED+=("SSL certificates")
+        echo "  ✓ All up to date"
+      fi
+    fi
+  else
+    SKIPPED+=("SSL certificates (none configured)")
+  fi
+fi
+
+# ── Linux-only: health checks ──
 
 if [[ "$OS" != "Darwin" ]]; then
-  if command -v certbot &>/dev/null; then
-    if sudo certbot certificates 2>/dev/null | grep -q "Certificate Name"; then
-      run "Renewing SSL certificates" sudo certbot renew
-    else
-      SKIPPED+=("SSL certificates (none configured)")
-    fi
-  fi
-
   # Syncthing: ensure service is running
   if command -v syncthing &>/dev/null; then
     echo "\n→ Checking syncthing service..."
@@ -326,9 +436,20 @@ if [[ "$OS" != "Darwin" ]]; then
     fi
   fi
 
-  # Check for failed systemd services
+  # Check for failed systemd services — auto-reset certbot failures
   echo "\n→ Checking systemd services..."
   failed=$(systemctl --failed --no-legend 2>/dev/null)
+  if [[ -n "$failed" ]]; then
+    # Reset certbot-related failures (transient lock issues)
+    for svc in certbot.service snap.certbot.renew.service; do
+      if echo "$failed" | grep -q "$svc"; then
+        echo "  → Resetting failed $svc"
+        sudo systemctl reset-failed "$svc" 2>/dev/null
+      fi
+    done
+    # Re-check after resets
+    failed=$(systemctl --failed --no-legend 2>/dev/null)
+  fi
   if [[ -z "$failed" ]]; then
     echo "  ✓ All services healthy"
   else
@@ -449,6 +570,14 @@ fi
 if (( ${#ERRORS[@]} > 0 )); then
   row "  ✗ Failed (${#ERRORS[@]}):"
   for item in "${ERRORS[@]}"; do
+    row "      • $item"
+  done
+fi
+
+# Cert warnings (individual broken certs with reasons)
+if (( ${#CERT_WARNINGS[@]} > 0 )); then
+  row "  ⚠ Broken certificates:"
+  for item in "${CERT_WARNINGS[@]}"; do
     row "      • $item"
   done
 fi
