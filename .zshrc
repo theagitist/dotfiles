@@ -8,6 +8,7 @@ export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:/snap/bin:$PATH"
 
 ZSH_THEME="dracula"
+DRACULA_DISPLAY_FULL_CWD=1
 
 plugins=(
     git
