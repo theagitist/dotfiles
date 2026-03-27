@@ -60,4 +60,5 @@ All managed by `setup.sh`:
 - [ncdu](https://dev.yorhel.nl/ncdu), [htop](https://htop.dev), [bpytop](https://github.com/aristocratos/bpytop), [tldr](https://tldr.sh)
 - [awscli](https://aws.amazon.com/cli/)
 - certbot (cross-platform — snap or brew)
+- macOS-only: [iTerm2](https://iterm2.com) + [Dracula theme](https://draculatheme.com/iterm) (downloaded to `~/.config/iterm2/`, import via Settings > Profiles > Colors > Color Presets > Import)
 - Linux-only: nginx, vlock

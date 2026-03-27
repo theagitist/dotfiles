@@ -311,6 +311,16 @@ if [[ "$OS" == "Darwin" ]]; then
     info "Installing iTerm2..."
     brew install --cask iterm2 && ok "iTerm2" || fail "iTerm2"
   fi
+
+  # Dracula theme for iTerm2
+  ITERM_DRACULA="$HOME/.config/iterm2/Dracula.itermcolors"
+  if [[ -f "$ITERM_DRACULA" ]]; then
+    skip "iTerm2 Dracula theme"
+  else
+    info "Downloading Dracula theme for iTerm2..."
+    mkdir -p "$HOME/.config/iterm2"
+    curl -fsSL -o "$ITERM_DRACULA" https://raw.githubusercontent.com/dracula/iterm/master/Dracula.itermcolors && ok "iTerm2 Dracula theme" || fail "iTerm2 Dracula theme"
+  fi
 fi
 
 # ── Linux-only ──
