@@ -301,6 +301,18 @@ else
   git clone https://github.com/tmux-plugins/tpm.git "$HOME/.tmux/plugins/tpm" && ok "tpm" || fail "tpm"
 fi
 
+# ── macOS-only ──
+
+if [[ "$OS" == "Darwin" ]]; then
+  echo "\n── macOS Apps ──"
+  if [[ -d "/Applications/iTerm.app" ]]; then
+    skip "iTerm2"
+  else
+    info "Installing iTerm2..."
+    brew install --cask iterm2 && ok "iTerm2" || fail "iTerm2"
+  fi
+fi
+
 # ── Linux-only ──
 
 if [[ "$OS" != "Darwin" ]]; then
