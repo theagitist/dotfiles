@@ -26,6 +26,7 @@ Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 Plug 'PhilRunninger/nerdtree-buffer-ops'
 Plug 'PhilRunninger/nerdtree-visual-selection'
 Plug 'goerz/jupytext.vim'
+Plug 'psliwka/vim-smoothie'
 
 call plug#end()
 
@@ -72,6 +73,14 @@ set nobackup
 set noswapfile
 set noerrorbells
 set scrolloff=8
+set autoread
+autocmd FocusGained,CursorHold * checktime
+set smoothscroll
+
+" Smooth scrolling (vim-smoothie)
+let g:smoothie_speed_constant_factor = 15
+let g:smoothie_speed_linear_factor = 15
+let g:smoothie_speed_exponentiation_factor = 0.8
 set signcolumn=yes
 set backspace=indent,eol,start
 set smartindent
@@ -140,6 +149,11 @@ inoremap <silent><expr> <C-e> coc#pum#visible() ? coc#pum#cancel() : "\<C-e>"
 " Shift+(K|J) move block (up|down)
 vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
+
+" Half-page scroll with J/K (via smoothie)
+nmap J <Plug>(SmoothieDownwards)
+nmap K <Plug>(SmoothieUpwards)
+nnoremap <leader>j J
 
 " Scroll faster
 nnoremap <C-e> 2<C-e>

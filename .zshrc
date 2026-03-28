@@ -127,3 +127,6 @@ command -v direnv &>/dev/null && eval "$(direnv hook zsh)"
 # ── Aliases ──
 
 [ -f "$HOME/.aliases" ] && source "$HOME/.aliases"
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
