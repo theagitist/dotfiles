@@ -337,6 +337,25 @@ if [[ "$OS" != "Darwin" ]]; then
   fi
 fi
 
+# ── Claude Code preferences ──
+
+echo "\n── Claude Code ──"
+CLAUDE_JSON="$HOME/.claude.json"
+if command -v jq &>/dev/null && [[ -f "$CLAUDE_JSON" ]]; then
+  current_mode=$(jq -r '.editorMode // "normal"' "$CLAUDE_JSON")
+  if [[ "$current_mode" == "vim" ]]; then
+    skip "claude vim mode"
+  else
+    info "Enabling vim mode..."
+    tmp=$(jq '.editorMode = "vim"' "$CLAUDE_JSON") && echo "$tmp" > "$CLAUDE_JSON" && ok "claude vim mode" || fail "claude vim mode"
+  fi
+elif command -v jq &>/dev/null; then
+  info "Setting vim mode..."
+  echo '{"editorMode":"vim"}' > "$CLAUDE_JSON" && ok "claude vim mode" || fail "claude vim mode"
+else
+  skip "claude vim mode (jq not installed yet)"
+fi
+
 # ── Timezone ──
 
 echo "\n── Timezone ──"
