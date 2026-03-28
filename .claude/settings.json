@@ -1,7 +1,4 @@
 {
-  "env": {
-    "PATH": "/home/theagitist/.bun/bin:/home/theagitist/.local/bin:/home/theagitist/.nvm/versions/node/v25.8.1/bin:/home/theagitist/.cargo/bin:/snap/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-  },
   "permissions": {
     "allow": [
       "mcp__pencil"
