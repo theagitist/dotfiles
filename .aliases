@@ -65,3 +65,5 @@ elif command -v bat &>/dev/null; then
     alias ccat='bat'
 fi
 
+# Connect to tmux
+alias tma='tmux new -As $(hostname)'
