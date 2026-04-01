@@ -109,6 +109,22 @@ install_package "w3m" "w3m" "w3m"
 install_package "duf" "duf" "duf"
 install_package "entr" "entr" "entr"
 
+# yazi: brew on macOS, cargo on Linux (not in apt)
+if command -v yazi &>/dev/null; then
+  skip "yazi"
+else
+  info "Installing yazi..."
+  if [[ "$OS" == "Darwin" ]]; then
+    brew install yazi && ok "yazi" || fail "yazi"
+  else
+    if command -v cargo &>/dev/null; then
+      cargo install --locked yazi-fm yazi-cli && ok "yazi" || fail "yazi"
+    else
+      fail "yazi (cargo not installed)"
+    fi
+  fi
+fi
+
 # direnv
 install_package "direnv" "direnv" "direnv"
 install_package "yq" "yq" "yq"
