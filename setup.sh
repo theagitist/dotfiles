@@ -129,6 +129,14 @@ fi
 install_package "aerc" "aerc" "aerc"
 install_package "pass" "pass" "pass"
 
+# ipython
+if command -v ipython &>/dev/null; then
+  skip "ipython"
+else
+  info "Installing ipython..."
+  pip3 install --user ipython && ok "ipython" || fail "ipython"
+fi
+
 # himalaya (CLI email client — built with OAuth2 support)
 if command -v himalaya &>/dev/null; then
   skip "himalaya"
