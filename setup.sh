@@ -129,12 +129,17 @@ fi
 install_package "aerc" "aerc" "aerc"
 install_package "pass" "pass" "pass"
 
-# ipython
+# ipython: pipx on Linux (PEP 668), brew on macOS
 if command -v ipython &>/dev/null; then
   skip "ipython"
 else
   info "Installing ipython..."
-  pip3 install --user ipython && ok "ipython" || fail "ipython"
+  if [[ "$OS" == "Darwin" ]]; then
+    brew install ipython && ok "ipython" || fail "ipython"
+  else
+    command -v pipx &>/dev/null || sudo apt-get install -y pipx
+    pipx install ipython && ok "ipython" || fail "ipython"
+  fi
 fi
 
 # himalaya (CLI email client — built with OAuth2 support)

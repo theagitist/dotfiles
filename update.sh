@@ -204,6 +204,19 @@ if command -v pip3 &>/dev/null; then
   fi
 fi
 
+# ── Shared: pipx packages ──
+
+if command -v pipx &>/dev/null; then
+  echo "\n→ Updating pipx packages..."
+  if pipx upgrade-all 2>/dev/null; then
+    UPDATED+=("pipx packages")
+    echo "  ✓ Done"
+  else
+    ERRORS+=("pipx packages")
+    echo "  ✗ Failed (continuing...)"
+  fi
+fi
+
 # ── Shared: Composer global packages ──
 
 if command -v composer &>/dev/null; then
