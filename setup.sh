@@ -276,6 +276,11 @@ else
       ok "lazygit" || fail "lazygit"
   fi
 fi
+# lazygit config: on macOS, symlink Library path to XDG path
+if [[ "$OS" == "Darwin" ]]; then
+  mkdir -p "$HOME/Library/Application Support/lazygit"
+  ln -sf "$HOME/.config/lazygit/config.yml" "$HOME/Library/Application Support/lazygit/config.yml"
+fi
 install_package "aws" "awscli" "awscli"
 install_package "syncthing" "syncthing" "syncthing"
 
