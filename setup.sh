@@ -376,6 +376,24 @@ else
   skip "claude vim mode (jq not installed yet)"
 fi
 
+# ── Device-specific aliases ──
+
+echo "\n── Device Aliases ──"
+if [[ "$OS" == "Darwin" ]]; then
+  MACHINE_ID="$(ioreg -d2 -c IOPlatformExpertDevice | awk -F'"' '/IOPlatformUUID/{print $4}')"
+else
+  MACHINE_ID="$(cat /etc/machine-id)"
+fi
+
+DEVICE_ALIASES="$HOME/.aliases-$MACHINE_ID"
+if [[ -f "$DEVICE_ALIASES" ]]; then
+  skip "device aliases ($MACHINE_ID)"
+else
+  info "Creating $DEVICE_ALIASES..."
+  echo "# Device-specific aliases for machine $MACHINE_ID" > "$DEVICE_ALIASES" && ok "device aliases ($MACHINE_ID)" || fail "device aliases"
+fi
+unset MACHINE_ID DEVICE_ALIASES
+
 # ── Timezone ──
 
 echo "\n── Timezone ──"

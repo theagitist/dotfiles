@@ -128,5 +128,14 @@ command -v direnv &>/dev/null && eval "$(direnv hook zsh)"
 
 [ -f "$HOME/.aliases" ] && source "$HOME/.aliases"
 
+# Device-specific aliases (keyed by machine-id)
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  _mid="$(ioreg -d2 -c IOPlatformExpertDevice | awk -F'"' '/IOPlatformUUID/{print $4}')"
+else
+  _mid="$(cat /etc/machine-id 2>/dev/null)"
+fi
+[ -n "$_mid" ] && [ -f "$HOME/.aliases-$_mid" ] && source "$HOME/.aliases-$_mid"
+unset _mid
+
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
