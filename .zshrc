@@ -79,6 +79,9 @@ fi
 bindkey -v
 export KEYTIMEOUT=1
 
+# Magic space: expand history references (!! !$ etc.) on space
+bindkey ' ' magic-space
+
 # Cursor shape: beam for insert, block for normal
 function zle-keymap-select {
   if [[ $KEYMAP == vicmd ]] || [[ $1 == 'block' ]]; then
@@ -123,6 +126,15 @@ fi
 # ── direnv ──
 
 command -v direnv &>/dev/null && eval "$(direnv hook zsh)"
+
+# ── edit command buffer ──
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey '^x^e' edit-command-line
+
+# ── Undo and Redo ──
+bindkey '^_' undo
+bindkey '^r' redo
 
 # ── Aliases ──
 
