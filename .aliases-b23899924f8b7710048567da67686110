@@ -4,3 +4,4 @@ hash -d t=/var/www/telaris.polivoxia.ca/
 hash -d s=/var/www/starmaps.polivoxia.ca/
 hash -d j=/var/www/www.journeyways.ca/
 hash -d p=/var/www/polivoxia.ca/html/
+hash -d o=~/apps/obsidian/

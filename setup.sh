@@ -392,7 +392,14 @@ else
   info "Creating $DEVICE_ALIASES..."
   echo "# Device-specific aliases for machine $MACHINE_ID" > "$DEVICE_ALIASES" && ok "device aliases ($MACHINE_ID)" || fail "device aliases"
 fi
-unset MACHINE_ID DEVICE_ALIASES
+
+LOCAL_LINK="$HOME/.aliases-local"
+if [[ "$(readlink "$LOCAL_LINK" 2>/dev/null)" == "$DEVICE_ALIASES" ]]; then
+  skip ".aliases-local symlink"
+else
+  ln -sf "$DEVICE_ALIASES" "$LOCAL_LINK" && ok ".aliases-local -> .aliases-$MACHINE_ID" || fail ".aliases-local symlink"
+fi
+unset MACHINE_ID DEVICE_ALIASES LOCAL_LINK
 
 # ── Timezone ──
 
