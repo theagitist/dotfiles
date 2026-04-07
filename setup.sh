@@ -108,6 +108,8 @@ install_package "jq" "jq" "jq"
 install_package "w3m" "w3m" "w3m"
 install_package "duf" "duf" "duf"
 install_package "entr" "entr" "entr"
+install_package "potrace" "potrace" "potrace"
+install_package "convert" "imagemagick" "imagemagick"
 
 install_package "lf" "lf" "lf"
 
