@@ -357,6 +357,50 @@ if [[ "$OS" != "Darwin" ]]; then
   else
     skip "certbot-nginx"
   fi
+
+  # chromium: headless browser for VPS use (scraping, PDF rendering, etc.)
+  if command -v chromium &>/dev/null || command -v chromium-browser &>/dev/null; then
+    skip "chromium"
+  else
+    info "Installing chromium..."
+    if sudo apt-get install -y chromium 2>/dev/null; then
+      ok "chromium"
+    elif sudo apt-get install -y chromium-browser 2>/dev/null; then
+      ok "chromium"
+    else
+      fail "chromium"
+    fi
+  fi
+fi
+
+# ── Typst ──
+
+echo "\n── Typst ──"
+if command -v typst &>/dev/null; then
+  skip "typst"
+else
+  info "Installing typst..."
+  if [[ "$OS" == "Darwin" ]]; then
+    brew install typst && ok "typst" || fail "typst"
+  else
+    ARCH="$(uname -m)"
+    case "$ARCH" in
+      x86_64)  TYPST_ARCH="x86_64-unknown-linux-musl" ;;
+      aarch64|arm64) TYPST_ARCH="aarch64-unknown-linux-musl" ;;
+      *) TYPST_ARCH="" ;;
+    esac
+    if [[ -z "$TYPST_ARCH" ]]; then
+      fail "typst (unsupported arch: $ARCH)"
+    else
+      TYPST_VERSION=$(curl -s "https://api.github.com/repos/typst/typst/releases/latest" | grep -Po '"tag_name": "\K[^"]*')
+      curl -Lo /tmp/typst.tar.xz "https://github.com/typst/typst/releases/latest/download/typst-${TYPST_ARCH}.tar.xz" && \
+        tar xf /tmp/typst.tar.xz -C /tmp && \
+        sudo install "/tmp/typst-${TYPST_ARCH}/typst" /usr/local/bin && \
+        rm -rf /tmp/typst.tar.xz "/tmp/typst-${TYPST_ARCH}" && \
+        ok "typst" || fail "typst"
+    fi
+    unset ARCH TYPST_ARCH TYPST_VERSION
+  fi
 fi
 
 # ── Claude Code preferences ──
