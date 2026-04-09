@@ -43,6 +43,27 @@ nmap <leader>gd :diffget //2<CR>
 " Set color scheme
 colorscheme dracula
 
+" Cursor visibility
+set cursorline
+set cursorcolumn
+highlight CursorLine   cterm=NONE ctermbg=236 guibg=#3a3d4d
+highlight CursorColumn cterm=NONE ctermbg=236 guibg=#3a3d4d
+highlight CursorLineNr cterm=bold ctermfg=228 guifg=#f1fa8c gui=bold
+
+" Brighter visual selection so the cursor stands out inside it
+highlight Visual ctermbg=60 guibg=#5f5f87 guifg=NONE cterm=NONE gui=NONE
+
+" Terminal cursor shape per mode (blinking block / bar / underline)
+" Use 2/4/6 instead of 1/3/5 for steady variants
+let &t_SI = "\e[5 q"  " insert  -> blinking bar
+let &t_SR = "\e[3 q"  " replace -> blinking underline
+let &t_EI = "\e[1 q"  " normal  -> blinking block
+augroup ResetCursorShape
+  autocmd!
+  autocmd VimEnter * silent !echo -ne "\e[1 q"
+  autocmd VimLeave * silent !echo -ne "\e[5 q"
+augroup END
+
 " Always show statusline
 set laststatus=2
 
