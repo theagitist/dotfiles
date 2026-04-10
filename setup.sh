@@ -403,6 +403,34 @@ else
   fi
 fi
 
+# ── Ollama ──
+
+echo "\n── Ollama ──"
+if command -v ollama &>/dev/null; then
+  skip "ollama"
+else
+  info "Installing ollama..."
+  if [[ "$OS" == "Darwin" ]]; then
+    brew install ollama && ok "ollama" || fail "ollama"
+  else
+    curl -fsSL https://ollama.com/install.sh | sh && ok "ollama" || fail "ollama"
+  fi
+fi
+
+# ── opencode ──
+
+echo "\n── opencode ──"
+if command -v opencode &>/dev/null; then
+  skip "opencode"
+else
+  info "Installing opencode..."
+  if [[ "$OS" == "Darwin" ]]; then
+    brew install sst/tap/opencode && ok "opencode" || fail "opencode"
+  else
+    curl -fsSL https://opencode.ai/install | bash && ok "opencode" || fail "opencode"
+  fi
+fi
+
 # ── Claude Code preferences ──
 
 echo "\n── Claude Code ──"
