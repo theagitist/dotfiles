@@ -28,6 +28,9 @@ plugins=(
 
 source "$ZSH/oh-my-zsh.sh"
 
+# Accept autosuggestion with ;
+bindkey ';' autosuggest-accept
+
 unsetopt AUTO_CD
 
 # ── History ──
