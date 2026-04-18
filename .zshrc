@@ -28,9 +28,6 @@ plugins=(
 
 source "$ZSH/oh-my-zsh.sh"
 
-# Accept autosuggestion with ;
-bindkey ';' autosuggest-accept
-
 unsetopt AUTO_CD
 
 # ── History ──
@@ -81,6 +78,17 @@ fi
 
 bindkey -v
 export KEYTIMEOUT=1
+
+# Accept autosuggestion with ; (falls back to literal ; when no suggestion)
+function _accept_or_semicolon {
+  if [[ -n "$POSTDISPLAY" ]]; then
+    zle autosuggest-accept
+  else
+    LBUFFER+=";"
+  fi
+}
+zle -N _accept_or_semicolon
+bindkey ';' _accept_or_semicolon
 
 # Magic space: expand history references (!! !$ etc.) on space
 bindkey ' ' magic-space
